@@ -1,0 +1,43 @@
+name: Production Django deploy Api Madeinuzb.com
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: GIT pulling from github repository
+      uses: appleboy/scp-action@master
+      env:
+        HOST: ${{ secrets.REGRU_HOST }}
+        USERNAME: ${{ secrets.REGRU_USERNAME }}
+        PORT: ${{ secrets.REGRU_PORT }}
+        KEY: ${{ secrets.REGRU_SSH_PRIVATE_KEY }}
+      with:
+        source: "."
+        target: "/UTKIRBEK-2022/MadeinUzb/MadeinUzb"
+
+    - name: Command using from script
+      uses: appleboy/ssh-action@master
+      env:
+        DJANGO_SETTINGS_MODULE: "MadeinUzb.settings"
+      with:
+        host: ${{ secrets.REGRU_HOST }}
+        USERNAME: ${{ secrets.REGRU_USERNAME }}
+        PORT: ${{ secrets.REGRU_PORT }}
+        KEY: ${{ secrets.REGRU_SSH_PRIVATE_KEY }}
+        envs: DJANGO_SETTINGS_MODULE
+        script_stop: true
+        script: |
+          git --work-tree=/UTKIRBEK-2022/MadeinUzb/MadeinUzb --git-dir=/UTKIRBEK-2022/MadeinUzb/MadeinUzb/.git clean -f .
+          /UTKIRBEK-2022/MadeinUzb/MadeinUzb/env/bin/pip install -r /UTKIRBEK-2022/MadeinUzb/MadeinUzb/requirements.txt
+          /UTKIRBEK-2022/MadeinUzb/MadeinUzb/env/bin/python /UTKIRBEK-2022/MadeinUzb/MadeinUzb/manage.py migrate
+          systemctl restart madeinuzbapi.service
+          sh /root/devops/madeinuzb.sh "${{ github.event.head_commit.message }}"
