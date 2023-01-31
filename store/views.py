@@ -1,16 +1,16 @@
-from django.shortcuts import render
-from rest_framework.response import Response
-from .serializers import *
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, filters
-from rest_framework import pagination
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+
+from .serializers import *
 
 
-class CustomPagination(pagination.PageNumberPagination):
-    page_size = 16
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
     page_size_query_param = 'page_size'
-    max_page_size = 50
-    page_query_param = 'page'
+    max_page_size = 100
+
 
 class CategoryView(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -23,33 +23,35 @@ class SubCatView(viewsets.ModelViewSet):
 
 
 class ProductView(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('?')
     serializer_class = ProductSerializer
-    # pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    pagination_class = StandardResultsSetPagination
+    filterset_fields = ['category', "top"]
+    ordering_fields = ["likes"]
 
-    def list(self, request, *args, **kwargs):
-        products = self.queryset.all()
-        try:
-            category = request.GET.get('category')
-            if int(category) != 0:
-                cat = Category.objects.filter(id=category).all()
-                products = self.queryset.filter(category__id=category).all()
-                page = int(request.GET.get('page'))
-                prds = products[:(page * 8 + 1)]
-                serializer = self.get_serializer(prds, many=True)
-                return Response(serializer.data)
-            else:
-                page = int(request.GET.get('page'))
-                # products = Product.objects.all()
-                prds = products[:(page * 8 + 1)]
-                serializer = self.get_serializer(prds, many=True)
-                return Response(serializer.data)
-        except:
-            serializer = self.get_serializer(products, many=True)
-            return Response(serializer.data)
-            
-            
-                       
+    # def list(self, request, *args, **kwargs):
+    #     products = self.queryset.all()
+    #     try:
+    #         category = request.GET.get('category')
+    #         if int(category) != 0:
+    #             cat = Category.objects.filter(id=category).all()
+    #             products = self.queryset.filter(category__id=category).all()
+    #             page = int(request.GET.get('page'))
+    #             prds = products[:(page * 8 + 1)]
+    #             serializer = self.get_serializer(prds, many=True)
+    #             return Response(serializer.data)
+    #         else:
+    #             page = int(request.GET.get('page'))
+    #             # products = Product.objects.all()
+    #             prds = products[:(page * 8 + 1)]
+    #             serializer = self.get_serializer(prds, many=True)
+    #             return Response(serializer.data)
+    #     except:
+    #         serializer = self.get_serializer(products, many=True)
+    #         return Response(serializer.data)
+
+
 class AddLike(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -65,7 +67,7 @@ class AddLike(viewsets.ModelViewSet):
         if (100 * product.likes) / all >= 5:
             product.top = True
         product.save()
-        
+
         return Response({"Status Okk"}, status=status.HTTP_200_OK)
 
 
@@ -137,7 +139,7 @@ class TopProductView(viewsets.ModelViewSet):
         except:
             serializer = self.get_serializer(products, many=True)
             return Response(serializer.data)
-            
+
 
 class ProductSearchView(viewsets.ModelViewSet):
     queryset = Product.objects.filter(top=True).all()
