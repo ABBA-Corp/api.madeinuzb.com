@@ -27,7 +27,7 @@ class ProductView(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     pagination_class = StandardResultsSetPagination
-    filterset_fields = ['category', "top"]
+    filterset_fields = ['category', "top", "sub_category"]
     ordering_fields = ["likes"]
 
     # def list(self, request, *args, **kwargs):
