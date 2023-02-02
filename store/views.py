@@ -7,7 +7,7 @@ from .serializers import *
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 8
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -90,16 +90,6 @@ class DeleteLike(viewsets.ModelViewSet):
         return Response({"Status Okk"}, status=status.HTTP_200_OK)
 
 
-class BestProduct(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-    def list(self, request, *args, **kwargs):
-        products = self.queryset.all().order_by("-likes")
-        serializer = self.get_serializer(products, many=True)
-        return Response(serializer.data)
-
-
 class SliderView(viewsets.ModelViewSet):
     queryset = Slider.objects.all()
     serializer_class = SliderSerializer
@@ -123,22 +113,6 @@ class EventView(viewsets.ModelViewSet):
 class PartnerView(viewsets.ModelViewSet):
     queryset = Partner.objects.all()
     serializer_class = PartnerSerializer
-
-
-class TopProductView(viewsets.ModelViewSet):
-    queryset = Product.objects.filter(top=True).all()
-    serializer_class = ProductSerializer
-
-    def list(self, request, *args, **kwargs):
-        products = self.queryset.all()
-        try:
-            page = int(request.GET.get('page'))
-            prds = products[:(page * 8 + 1)]
-            serializer = self.get_serializer(prds, many=True)
-            return Response(serializer.data)
-        except:
-            serializer = self.get_serializer(products, many=True)
-            return Response(serializer.data)
 
 
 class ProductSearchView(viewsets.ModelViewSet):
