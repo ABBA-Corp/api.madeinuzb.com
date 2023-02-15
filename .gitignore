@@ -331,3 +331,5 @@ medtour/media/
 .idea/inspectionProfiles
 files/
 env/
+
+db.sqlite3
