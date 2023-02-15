@@ -1,4 +1,4 @@
-name: Production Django deploy Api Madeinuzb.com
+name: Production Django deploy api.madeinuzb.com
 
 on:
   push:
