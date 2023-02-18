@@ -16,7 +16,7 @@ class Category(models.Model):
     image = models.ImageField(null=True)
 
     def __str__(self):
-        return self.name_uz
+       return "category" if not self.name_uz else self.name_uz
 
 
 class SubCategory(models.Model):
