@@ -13,7 +13,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class CategoryView(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.prefetch_related("product_set").annotate(products_count=Count('product'))
     serializer_class = CategorySerializer
 
 
@@ -26,7 +26,7 @@ class ProductView(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('?')
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    # pagination_class = StandardResultsSetPagination
+    pagination_class = StandardResultsSetPagination
     filterset_fields = ['category', "top"]
     ordering_fields = ["likes"]
 

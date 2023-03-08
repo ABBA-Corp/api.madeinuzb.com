@@ -1,6 +1,6 @@
 from django.db import models
 from smart_selects.db_fields import GroupedForeignKey
-from colorfield.fields import ColorField
+
 
 class Category(models.Model):
     name_uz = models.CharField(max_length=200, null=True, blank=True)
@@ -16,7 +16,7 @@ class Category(models.Model):
     image = models.ImageField(null=True)
 
     def __str__(self):
-       return "category" if not self.name_uz else self.name_uz
+        return "category" if not self.name_uz else self.name_uz
 
 
 class SubCategory(models.Model):
@@ -63,7 +63,7 @@ class Product(models.Model):
     count = models.IntegerField(default=0)
     minimum = models.IntegerField(default=0)
     likes = models.IntegerField(default=0)
-    top  = models.BooleanField(default=False)
+    top = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name_uz
@@ -83,7 +83,6 @@ class Slider(models.Model):
     color = models.CharField(max_length=20, null=True, blank=True)
     image = models.ImageField(null=True, blank=True)
     url = models.URLField(null=True)
-
 
     def __str__(self):
         return self.name_uz
@@ -134,4 +133,3 @@ class Event(models.Model):
 
 class Partner(models.Model):
     image = models.ImageField(null=True, blank=True)
-    

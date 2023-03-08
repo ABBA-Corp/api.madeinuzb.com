@@ -1,11 +1,19 @@
+from django.db.models import Count
 from rest_framework import serializers
+
 from .models import *
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
         fields = "__all__"
+
+    @classmethod
+    def get_count(cls, obj):
+        return obj.products_count
 
 
 class SubCategorySerializer(serializers.ModelSerializer):

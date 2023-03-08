@@ -329,6 +329,7 @@ medtour/media/
 .pytest_cache/
 .env
 .idea/inspectionProfiles
+.idea/
 files/
 env/
 
