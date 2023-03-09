@@ -7,7 +7,7 @@ from .serializers import *
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 8
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -27,7 +27,13 @@ class ProductView(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     pagination_class = StandardResultsSetPagination
-    filterset_fields = ['category', "top"]
+    # filterset_fields = ['category', "top", "sub_category"]
+    filterset_fields = {
+        "id": ["exact", "in"],
+        "category": ["exact"],
+        "top": ["exact"],
+        "sub_category": ["exact"]
+    }
     ordering_fields = ["likes"]
 
     # def list(self, request, *args, **kwargs):
@@ -146,3 +152,10 @@ class ProductSearchView(viewsets.ModelViewSet):
     serializer_class = ProductSearchSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ["name_uz", "name_en", "name_ru", "name_ma", "name_sw"]
+
+    def list(self, request, *args, **kwargs):
+        search = request.query_params.get('search')
+        if not search:
+            return Response(
+                self.get_serializer(Product.objects.none(), many=True).data,status=200)
+        return super().list(request, *args, **kwargs)
